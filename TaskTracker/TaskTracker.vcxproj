@@ -18,17 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Searcher.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Searcher_main.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{0b9d9ceb-f00d-4d55-95a6-dd0f1b434779}</ProjectGuid>
-    <RootNamespace>Searcher</RootNamespace>
+    <ProjectGuid>{1451dff7-b181-427e-94af-08389ac1aaf9}</ProjectGuid>
+    <RootNamespace>TaskTracker</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -133,6 +127,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="TaskTracker.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TaskTracker_main.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
