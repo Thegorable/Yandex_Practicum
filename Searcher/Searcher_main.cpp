@@ -1,12 +1,5 @@
 ﻿#include "Searcher.h"
 
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-#include <cmath>
-#include <set>
-#include <algorithm>
 using namespace std;
 
 void PrintDocument(const Document& document) {
@@ -36,7 +29,5 @@ int main() {
     for (const Document& document : search_server.FindTopDocuments("fluffy groomed cat"s, [](int document_id, DocumentStatus status, int rating) { return document_id % 2 == 0; })) {
         PrintDocument(document);
     }
-    return 0;
-
     return 0;
 }
