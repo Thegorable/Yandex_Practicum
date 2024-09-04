@@ -96,10 +96,10 @@ public:
         }
     }
 
-    vector<Document> FindTopDocuments(const string& raw_query, 
-        DocumentStatus status = DocumentStatus::ACTUAL) const {
+    template <typename predicat>
+    vector<Document> FindTopDocuments(const string& raw_query, predicat comp) const {
         const Query query = ParseQuery(raw_query);
-        vector<Document> matched_documents = FindAllDocuments(query, status);
+        vector<Document> matched_documents = FindAllDocuments(query, comp);
 
         sort(matched_documents.begin(), matched_documents.end(),
             [](const Document& lhs, const Document& rhs) {
@@ -114,6 +114,16 @@ public:
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
         }
         return matched_documents;
+    }
+
+    vector<Document> FindTopDocuments(const string& raw_query) const {
+        return this->FindTopDocuments(raw_query, [](int document_id, DocumentStatus status, int rating) { 
+            return status == DocumentStatus::ACTUAL; });
+    }
+
+    vector<Document> FindTopDocuments(const string& raw_query, const DocumentStatus status) const {
+        return this->FindTopDocuments(raw_query, [status](int document_id, DocumentStatus status_lambda, int rating) {
+            return status == status_lambda; });
     }
 
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
@@ -168,8 +178,8 @@ private:
     };
 
     //methods
-    vector<Document> FindAllDocuments(const Query& query, 
-        DocumentStatus status = DocumentStatus::ACTUAL) const {
+    template <typename predicat>
+    vector<Document> FindAllDocuments(const Query& query, predicat comp) const {
         map<int, double> document_to_relevance;
         for (const string& word : query.plus_words) {
             if (word_to_document_freqs_.count(word) == 0 ) {
@@ -192,7 +202,7 @@ private:
 
         vector<Document> matched_documents;
         for (const auto& [id, relevance] : document_to_relevance) {
-            if (docs_status.at(id) == status) {
+            if (comp(id, docs_status.at(id), docs_rating.at(id)) ) {
                 matched_documents.push_back({ id, relevance, docs_rating.at(id) });
             }
         }
@@ -232,7 +242,6 @@ private:
 
     QueryWord ParseQueryWord(string text) const {
         bool is_minus = false;
-        // Word shouldn't be empty
         if (text[0] == '-') {
             is_minus = true;
             text = text.substr(1);
