@@ -8,6 +8,7 @@
 #include <vector>
 #include <cmath>
 #include <tuple>
+#include <numeric>
 
 using namespace std;
 
@@ -106,9 +107,7 @@ public:
                 if (abs(lhs.relevance - rhs.relevance) < EPSILON) {
                     return lhs.rating > rhs.rating;
                 }
-                else {
-                    return lhs.relevance > rhs.relevance;
-                }
+                return lhs.relevance > rhs.relevance;
             });
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
@@ -116,12 +115,7 @@ public:
         return matched_documents;
     }
 
-    vector<Document> FindTopDocuments(const string& raw_query) const {
-        return this->FindTopDocuments(raw_query, [](int document_id, DocumentStatus status, int rating) { 
-            return status == DocumentStatus::ACTUAL; });
-    }
-
-    vector<Document> FindTopDocuments(const string& raw_query, const DocumentStatus status) const {
+    vector<Document> FindTopDocuments(const string& raw_query, const DocumentStatus status = DocumentStatus::ACTUAL) const {
         return this->FindTopDocuments(raw_query, [status](int document_id, DocumentStatus status_lambda, int rating) {
             return status == status_lambda; });
     }
@@ -217,10 +211,7 @@ private:
             return static_rating;
         }
 
-        for (int i : ratings) {
-            static_rating += i;
-        }
-
+        static_rating = accumulate(ratings.begin(), ratings.end(), 0);
         static_rating /= static_cast<int>(ratings.size());
 
         return static_rating;
