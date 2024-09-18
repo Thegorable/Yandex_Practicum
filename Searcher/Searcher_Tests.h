@@ -1,14 +1,14 @@
 #pragma once
 #include <functional>
-#include "Searcher.h"
 
 enum class StopWordsStatus { NoStopWords, GeneralStopWords, OneStopWord, NotWorkingStopWords, EveryStopWordIsUsed };
+enum class MinusWordsStatus { NoMinusWords, SomeMinusWords, OneMinusWord, NotWorkingMinusWords, AllDocCoveredMinusWord };
 
 struct inputDocs {
     vector<int> ids;
     vector<string> doc;
     vector <DocumentStatus> status;
-    vector <vector<int>> ratings;
+    vector <vector<int>> ratings_raw;
     string raw_query;
     string raw_stop_words;
 
@@ -17,8 +17,10 @@ struct inputDocs {
     map<string, map<int, double>> word_to_document_freqs_result;
     map<int, int> docs_rating_result;
     map<int, DocumentStatus> docs_status_result;
+    set<string> plus_words;
+    set<string> minus_words;
 
-    void FillGeneralTest(const StopWordsStatus stop_wrods_status);
+    void FillGeneralTest(const StopWordsStatus stop_wrods_status, const MinusWordsStatus minus_words_status);
 };
 
 template<typename T1>
@@ -135,7 +137,6 @@ void AssertEqualElementsContainers(const contType1& container_1, const contType2
             if (abort) { std::abort(); }
         }
     }
-
 }
 
 template <typename TestFunc>
@@ -157,6 +158,11 @@ void RunTestImpl(const TestFunc& func, const string& test_name) {
 void TestAllAddDocuments();
 
 void TestAddDocuments(const inputDocs& test_docs);
+
+void TestParsingAllMinusWords();
+void TestMinusWordsExcludingDoc(const inputDocs& test_docs);
+
+void TestParsingMinusWords(const inputDocs& test_docs);
 
 void TestExcludeStopWordsFromAddedDocumentContent();
 

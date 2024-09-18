@@ -101,8 +101,6 @@ private:
     Query ParseQuery(const string& text) const;
 
     double ComputeWordInverseDocumentFreq(const string& word) const;
-
-    friend void TestAddDocuments(const inputDocs& test_docs);
 };
 
 extern ostream& operator << (ostream& os, const std::pair<const int, const double> id_freq);

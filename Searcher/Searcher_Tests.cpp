@@ -1,5 +1,3 @@
-#include "Searcher_Tests.h"
-
 void TestAddDocuments(const inputDocs& test_docs) {
 
     SearchServer server;
@@ -8,15 +6,25 @@ void TestAddDocuments(const inputDocs& test_docs) {
     for (size_t i = 0; i < test_docs.docs_count_result; i++) {
         server.AddDocument(test_docs.ids[i], test_docs.doc[i], test_docs.status[i], test_docs.ratings[i]);
     }
-    ASSERT_EQUAL(server.document_count_, test_docs.docs_count_result);
+    ASSERT_EQUAL(server.GetDocumentCount(), test_docs.docs_count_result);
 
     for (const int id : test_docs.ids) {
         ASSERT(server.docs_rating.count(id));
         ASSERT_EQUAL(server.docs_rating.at(id), test_docs.docs_rating_result.at(id));
         ASSERT_EQUAL(server.docs_status.at(id), test_docs.docs_status_result.at(id));
     }
-    ASSERT_EQUAL_EMPTY_CONTAINERS(server.stop_words_, test_docs.stop_words_result);
+}
+
+void TestExcludingStopWords(const inputDocs& test_docs) {
+    SearchServer server;
+    server.SetStopWords(test_docs.raw_stop_words);
+
+    for (size_t i = 0; i < test_docs.docs_count_result; i++) {
+        server.AddDocument(test_docs.ids[i], test_docs.doc[i], test_docs.status[i], test_docs.ratings[i]);
+    }
     
+    ASSERT_EQUAL_EMPTY_CONTAINERS(server.stop_words_, test_docs.stop_words_result);
+
     if (server.stop_words_.empty() != test_docs.stop_words_result.empty()) {
         ASSERT_EQUAL_SIZE_CONTAINERS(server.stop_words_, test_docs.stop_words_result);
         ASSERT_EQUAL_ELEMENTS_CONTAINERS(server.stop_words_, test_docs.stop_words_result);
@@ -26,11 +34,11 @@ void TestAddDocuments(const inputDocs& test_docs) {
         string hint_word = "The word "s + word + " doesn't exists in server"s;
         ASSERT_HINT(server.word_to_document_freqs_.count(word), hint_word);
         ASSERT_EQUAL_SIZE_CONTAINERS(server.word_to_document_freqs_.at(word), id_frec);
-        
+
         for (auto it_1 = server.word_to_document_freqs_.at(word).begin(), it_2 = id_frec.begin();
             it_1 != server.word_to_document_freqs_.at(word).end() && it_2 != id_frec.end();
             ++it_1, ++it_2) {
-            
+
             const auto& elem_l = *it_1;
             const auto& elem_2 = *it_2;
             const double& freq_l = elem_l.second;
@@ -40,10 +48,25 @@ void TestAddDocuments(const inputDocs& test_docs) {
             ASSERT_EQUAL_FLOAT(freq_l, freq_r);
         }
     }
-
 }
 
-void TestMinusWords(const inputDocs& test_docs) {
+void TestParsingMinusWords(const inputDocs& test_docs) {
+    SearchServer server;
+    SearchServer::Query words = server.ParseQuery(test_docs.raw_query);
+    ASSERT_EQUAL_EMPTY_CONTAINERS(words.plus_words, test_docs.plus_words);
+    if (words.plus_words.empty() != test_docs.plus_words.empty()) {
+        ASSERT_EQUAL_SIZE_CONTAINERS(words.plus_words, test_docs.plus_words);
+        ASSERT_EQUAL_ELEMENTS_CONTAINERS(words.plus_words, test_docs.plus_words);
+    }
+
+    ASSERT_EQUAL_EMPTY_CONTAINERS(words.minus_words, test_docs.minus_words);
+    if (words.plus_words.empty() != test_docs.plus_words.empty()) {
+        ASSERT_EQUAL_SIZE_CONTAINERS(words.minus_words, test_docs.minus_words);
+        ASSERT_EQUAL_ELEMENTS_CONTAINERS(words.minus_words, test_docs.minus_words);
+    }
+}
+
+void TestMinusWordsExcludingDoc(const inputDocs& test_docs) {
     SearchServer server;
     server.SetStopWords(test_docs.raw_stop_words);
 
@@ -76,23 +99,36 @@ void TestExcludeStopWordsFromAddedDocumentContent() {
 
 void TestAllAddDocuments() {
     inputDocs test;
-    test.FillGeneralTest(StopWordsStatus::GeneralStopWords);
+    test.FillGeneralTest(StopWordsStatus::NoStopWords, MinusWordsStatus::NoMinusWords);
     TestAddDocuments(test);
-    test.FillGeneralTest(StopWordsStatus::NoStopWords);
+    test.FillGeneralTest(StopWordsStatus::GeneralStopWords, MinusWordsStatus::NoMinusWords);
     TestAddDocuments(test);
-    test.FillGeneralTest(StopWordsStatus::NotWorkingStopWords);
+    test.FillGeneralTest(StopWordsStatus::OneStopWord, MinusWordsStatus::NoMinusWords);
     TestAddDocuments(test);
-    test.FillGeneralTest(StopWordsStatus::OneStopWord);
+    test.FillGeneralTest(StopWordsStatus::NotWorkingStopWords, MinusWordsStatus::NoMinusWords);
     TestAddDocuments(test);
-    test.FillGeneralTest(StopWordsStatus::EveryStopWordIsUsed);
+    test.FillGeneralTest(StopWordsStatus::EveryStopWordIsUsed, MinusWordsStatus::NoMinusWords);
     TestAddDocuments(test);
+}
+
+void TestParsingAllMinusWords() {
+    inputDocs test;
+    test.FillGeneralTest(StopWordsStatus::GeneralStopWords, MinusWordsStatus::SomeMinusWords);
+    TestParsingMinusWords(test);
+    test.FillGeneralTest(StopWordsStatus::GeneralStopWords, MinusWordsStatus::OneMinusWord);
+    TestParsingMinusWords(test);
+    test.FillGeneralTest(StopWordsStatus::GeneralStopWords, MinusWordsStatus::NotWorkingMinusWords);
+    TestParsingMinusWords(test);
+    test.FillGeneralTest(StopWordsStatus::GeneralStopWords, MinusWordsStatus::AllDocCoveredMinusWord);
+    TestParsingMinusWords(test);
 }
 
 void TestSearchServer() {
     RUN_TEST(TestAllAddDocuments);
+    RUN_TEST(TestParsingAllMinusWords);
 }
 
-void inputDocs::FillGeneralTest(const StopWordsStatus stop_wrods_status) {
+void inputDocs::FillGeneralTest(const StopWordsStatus stop_wrods_status, const MinusWordsStatus minus_words_status) {
     ids = { 3, 7, 12, -5, 0 };
     doc = { "white cat and cool collar"s,
         "fluffy cat fluffy tail"s,
@@ -110,7 +146,38 @@ void inputDocs::FillGeneralTest(const StopWordsStatus stop_wrods_status) {
     DocumentStatus::ACTUAL,
     DocumentStatus::ACTUAL,
     DocumentStatus::BANNED };
-    raw_query = "fluffy groomed cat"s;
+    
+    switch (minus_words_status) {
+    case MinusWordsStatus::NoMinusWords:
+        raw_query = "fluffy groomed cat"s;
+        minus_words = {};
+        plus_words = { "fluffy"s, "groomed"s, "cat"s };
+        break;
+
+    case MinusWordsStatus::NotWorkingMinusWords:
+        raw_query = "fluffy groomed cat -padla"s;
+        minus_words = {"padla"s};
+        plus_words = { "fluffy"s, "groomed"s, "cat"s };
+        break;
+
+    case MinusWordsStatus::OneMinusWord:
+        raw_query = "fluffy groomed cat -cool"s;
+        minus_words = {"cool"};
+        plus_words = { "fluffy"s, "groomed"s, "cat"s };
+        break;
+
+    case MinusWordsStatus::SomeMinusWords:
+        raw_query = "fluffy -dog groomed cat -cool"s;
+        minus_words = { "dog"s, "cool"};
+        plus_words = { "fluffy"s, "groomed"s, "cat"s };
+        break;
+
+    case MinusWordsStatus::AllDocCoveredMinusWord:
+        raw_query = "fluffy -dog -cat -groomed eyes"s;
+        minus_words = { "dog"s, "cat"s, "groomeds"};
+        plus_words = { "fluffy"s, "eyes"s};
+        break;
+    }
     
     switch (stop_wrods_status) {
     case StopWordsStatus::GeneralStopWords:

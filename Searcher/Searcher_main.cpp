@@ -1,5 +1,5 @@
 ﻿#include "Searcher.h"
-#include "Searcher_Tests.h"
+#include "Searcher_Unit_Tests.h"
 
 using namespace std;
 

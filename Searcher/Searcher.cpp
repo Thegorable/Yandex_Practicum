@@ -113,7 +113,6 @@ tuple<vector<string>, DocumentStatus> SearchServer::MatchDocument(const string& 
     Query query = ParseQuery(raw_query);
 
     vector <string>& matched_words = get<0>(matched_docs);
-    set <string> matched_words_temp;
 
     for (const string& word : query.minus_words) {
         if (word_to_document_freqs_.count(word) &&
