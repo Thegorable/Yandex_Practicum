@@ -1,8 +1,24 @@
 ﻿#include"Searcher.h"
 
-ostream& operator << (ostream& os, const DocumentStatus& status) {
-    os << static_cast<int>(status);
-    return os;
+ostream& operator<<(ostream& output, const DocumentStatus& status) {
+    switch (status) {
+    case DocumentStatus::ACTUAL:
+        output << "ACTUAL"s;
+        break;
+    case DocumentStatus::IRRELEVANT:
+        output << "IRRELEVANT"s;
+        break;
+    case DocumentStatus::BANNED:
+        output << "BANNED"s;
+        break;
+    case DocumentStatus::REMOVED:
+        output << "REMOVED"s;
+        break;
+    default:
+        output << "<unknown>"s;
+        break;
+    }
+    return output;
 }
 
 template<>
@@ -84,24 +100,6 @@ void SearchServer::AddDocument(int doc_id,
     }
 }
 
-    template <typename DocumentPredicate>
-vector<Document> SearchServer::FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
-    const Query query = ParseQuery(raw_query);
-    vector<Document> matched_documents = FindAllDocuments(query, document_predicate);
-
-    sort(matched_documents.begin(), matched_documents.end(),
-        [](const Document& lhs, const Document& rhs) {
-            if (abs(lhs.relevance - rhs.relevance) < EPSILON) {
-                return lhs.rating > rhs.rating;
-            }
-            return lhs.relevance > rhs.relevance;
-        });
-    if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
-        matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
-    }
-    return matched_documents;
-}
-
 vector<Document> SearchServer::FindTopDocuments(const string& raw_query, const DocumentStatus status) const {
     return this->FindTopDocuments(raw_query, [status](int document_id, DocumentStatus status_lambda, int rating) {
         return status == status_lambda; });
@@ -135,37 +133,6 @@ tuple<vector<string>, DocumentStatus> SearchServer::MatchDocument(const string& 
 
 int SearchServer::GetDocumentCount() {
     return document_count_;
-}
-
-template <typename predicat>
-vector<Document> SearchServer::FindAllDocuments(const Query& query, predicat comp) const {
-    map<int, double> document_to_relevance;
-    for (const string& word : query.plus_words) {
-        if (word_to_document_freqs_.count(word) == 0) {
-            continue;
-        }
-        const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
-        for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
-            document_to_relevance[document_id] += term_freq * inverse_document_freq;
-        }
-    }
-
-    for (const string& word : query.minus_words) {
-        if (word_to_document_freqs_.count(word) == 0) {
-            continue;
-        }
-        for (const auto& [document_id, _] : word_to_document_freqs_.at(word)) {
-            document_to_relevance.erase(document_id);
-        }
-    }
-
-    vector<Document> matched_documents;
-    for (const auto& [id, relevance] : document_to_relevance) {
-        if (comp(id, docs_status.at(id), docs_rating.at(id))) {
-            matched_documents.push_back({ id, relevance, docs_rating.at(id) });
-        }
-    }
-    return matched_documents;
 }
 
 int SearchServer::ComputeAverageRating(const vector<int>& ratings) {

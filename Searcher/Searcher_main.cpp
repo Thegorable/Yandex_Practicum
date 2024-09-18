@@ -1,9 +1,7 @@
 ﻿#include "Searcher.h"
-#include "Searcher_Unit_Tests.h"
-
-using namespace std;
+#include"Searcher_Tests.h"
 
 int main() {
     TestSearchServer();
-    cout << "Search server testing finished"s << endl;
+    return 0;
 }

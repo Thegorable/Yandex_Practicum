@@ -24,9 +24,6 @@
     <ClInclude Include="BusManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Searcher_Unit_Tests.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Searcher_Tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -39,9 +36,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Searcher_Tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Searcher_Unit_Tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

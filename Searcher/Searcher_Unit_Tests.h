@@ -210,6 +210,6 @@ void RunTestImpl(const TestFunc& func, const string& test_name) {
 
 #define RUN_TEST(func) RunTestImpl(func, #func)
 #define ASSERT(a) Assert((a));
-#define ASSERT_HINT(a, hint) AssertHint((a), __FILE__, (__FUNCTION__), __LINE__, hint = (hint));
+#define ASSERT_HINT(a, hint) AssertHint((a), (hint), __FILE__, (__FUNCTION__), __LINE__, true);
 #define ASSERT_EQUAL(a, b) AssertEqual((a), (b), (#a), (#b));
 #define ASSERT_EQUAL_HINT(a, b, hint) AssertEqualHint((a), (b), (#a), (#b), __FILE__, (__FUNCTION__), __LINE__, hint = (hint), true);
