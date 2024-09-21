@@ -27,15 +27,24 @@
     <ClInclude Include="Searcher_Tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Rational.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Searcher_main.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Searcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Searcher_Tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rational.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Searcher_Full.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

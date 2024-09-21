@@ -1,7 +1,4 @@
 ﻿#pragma once
-#ifndef __STD__LIBS__
-#define __STD__LIBS__
-
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -13,23 +10,25 @@
 #include <cmath>
 #include <tuple>
 #include <numeric>
-
-#endif // __STD__LIBS__
+#include <optional>
+#include <stdexcept>
 
 using namespace std;
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 const double EPSILON = 1e-6;
 
-template<typename T>
-bool IsEqualFloat(const T& a, const T& b) {
-    return a == b;
-}
-
 struct Document {
-    int id;
-    double relevance;
-    int rating;
+    Document() = default;
+
+    Document(int doc_id, double doc_relevance = 0, int doc_rating = 0) :
+        id(doc_id), 
+        relevance(doc_relevance), 
+        rating(doc_rating) {}
+
+    int id = 0;
+    double relevance = 0;
+    int rating = 0;
 };
 
 enum class DocumentStatus {
@@ -49,10 +48,34 @@ vector<string> SplitIntoWords(const string& text);
 
 vector<int> ReadNumbers(int count);
 
+bool IsCharSpecSymbol(char c);
+
+bool IsNotContainSpecSymbols(const string& text);
+
+bool IsCharsAreDoubleMinus(const char* c);
+
+bool IsNotCharsAfterMinus(const char* c);
+
+void PrintDocument(const Document& document);
+
 struct inputDocs;
 
 class SearchServer {
 public:
+    SearchServer() = default;
+
+    template<class container>
+    SearchServer(const container& cont) {
+        for (const auto& word : cont) {
+            if (!IsNotContainSpecSymbols(word)) {
+                throw invalid_argument("Stop words query contains special symbols");
+            }
+            stop_words_.insert(word);
+        }
+    }
+
+    SearchServer(const string& text);
+    
     void SetStopWords(const string& text);
 
     void AddDocument(int doc_id,
@@ -61,28 +84,36 @@ public:
         const vector<int>& ratings);
 
     template <typename DocumentPredicate>
-    vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
-        const Query query = ParseQuery(raw_query);
-        vector<Document> matched_documents = FindAllDocuments(query, document_predicate);
+    vector<Document> FindTopDocuments(const string& raw_query,
+        DocumentPredicate document_predicate) const {
 
-        sort(matched_documents.begin(), matched_documents.end(),
+        if (!IsClearRawQuery(raw_query)) { throw invalid_argument("Query is dirty"s); }
+
+        const Query query = ParseQuery(raw_query);
+        vector<Document> matched_docs = FindAllDocuments(query, document_predicate);
+
+        sort(matched_docs.begin(), matched_docs.end(),
             [](const Document& lhs, const Document& rhs) {
                 if (abs(lhs.relevance - rhs.relevance) < EPSILON) {
                     return lhs.rating > rhs.rating;
                 }
                 return lhs.relevance > rhs.relevance;
             });
-        if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
-            matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
+        if (matched_docs.size() > MAX_RESULT_DOCUMENT_COUNT) {
+            matched_docs.resize(MAX_RESULT_DOCUMENT_COUNT);
         }
-        return matched_documents;
+        return matched_docs;
     }
+    
+    vector<Document> FindTopDocuments(const string& raw_query,
+        const DocumentStatus status = DocumentStatus::ACTUAL) const;
 
-    vector<Document> FindTopDocuments(const string& raw_query, const DocumentStatus status = DocumentStatus::ACTUAL) const;
-
-    tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const;
+    tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query,
+        int document_id) const;
 
     int GetDocumentCount();
+
+    int GetDocumentId(int index) const;
 
 private:
     int document_count_ = 0;
@@ -90,6 +121,7 @@ private:
     map<string, map<int, double>> word_to_document_freqs_;
     map<int, int> docs_rating;
     map<int, DocumentStatus> docs_status;
+    vector<int> ids;
 
     struct QueryWord {
         string data;
@@ -144,8 +176,6 @@ private:
     Query ParseQuery(const string& text) const;
 
     double ComputeWordInverseDocumentFreq(const string& word) const;
+
+    bool IsClearRawQuery(const string& raw_query) const;
 };
-
-extern ostream& operator << (ostream& os, const std::pair<const int, const double> id_freq);
-
-SearchServer CreateSearchServer();

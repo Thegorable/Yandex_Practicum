@@ -130,6 +130,25 @@ void RunTestImpl(const TestFunc& func, const string& test_name) {
 #define ASSERT_EQUAL(a, b) AssertEqualInt((a), (b), (#a), (#b), __FILE__, (__FUNCTION__), __LINE__, true);
 #define ASSERT_EQUAL_HINT(a, b, hint) AssertEqualHint((a), (b), (#a), (#b), __FILE__, (__FUNCTION__), __LINE__, hint = (hint), true);
 
+template<class function>
+void AssertExeptionHintNegative(const function& func, const string& hint) {
+    try {
+        func();
+        ASSERT_HINT(false, hint);
+    }
+    catch (...) {}
+}
+
+template<class function>
+void AssertExeptionHintPositive(const function& func, const string& hint) {
+    try {
+        func();
+    }
+    catch (...) {
+        ASSERT_HINT(false, hint);
+    }
+}
+
 bool EqualFloat(double a, double b);
 void TestExcludeStopWords();
 void TestExcludeDocumentsWithMinusWords();
@@ -142,4 +161,19 @@ void TestRelevanceCalculation();
 void TestMatchingDocuments();
 void TestGettingDocumentCount();
 
+//Additive functions tests
+void TestStringContaintSpecSymbols();
+void TestIsCharsAreDoubleMinus();
+void TestIsNotCharsAfterMinus();
+
+// Exeption Tests
+void TestStopWordsQueryNotContainSpecSymbols();
+void TestAddDocUniqueIdDoc();
+void TestAddDocWithPositiveIdDoc();
+void TestAddDocContainingSpecSymbol();
+void TestClearRawFindDocs();
+void TestClearRawMatchDocs();
+
+void TestAdditiveFunctions();
 void TestSearchServer();
+void TestSearchServerExeptions();
