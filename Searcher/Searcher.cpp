@@ -95,9 +95,8 @@ void PrintDocument(const Document& document) {
         << "rating = "s << document.rating << " }"s << endl;
 }
 
- SearchServer::SearchServer(const string& text) {
-     SetStopWords(text);
- }
+SearchServer::SearchServer(const string& text) :
+    SearchServer(SplitIntoWords(text)) {}
 
 void SearchServer::SetStopWords(const string& text) {
     if (!IsNotContainSpecSymbols(text)) {
@@ -142,11 +141,9 @@ vector<Document> SearchServer::FindTopDocuments(const string& raw_query,
 tuple<vector<string>, DocumentStatus> SearchServer::MatchDocument(const string& raw_query,
     int document_id) const {
     
-    if (!IsClearRawQuery(raw_query)) { throw invalid_argument("Query is dirty"s); }
-    
+    Query query = ParseQuery(raw_query);
     tuple<vector<string>, DocumentStatus> matched_docs(tuple<vector<string>, DocumentStatus>{});
     get<DocumentStatus>(matched_docs) = docs_status.at(document_id);
-    Query query = ParseQuery(raw_query);
 
     for (const string& word : query.minus_words) {
         if (word_to_document_freqs_.count(word) &&
@@ -173,7 +170,6 @@ int SearchServer::GetDocumentCount() {
 }
 
 int SearchServer::GetDocumentId(int index) const {
-    if (index < 0 || index >= document_count_) { throw out_of_range("Invalid provided index"s); }
     return ids.at(index);
 }
 
@@ -215,6 +211,8 @@ SearchServer::QueryWord SearchServer::ParseQueryWord(string text) const {
 }
 
 SearchServer::Query SearchServer::ParseQuery(const string& text) const {
+    if (!IsClearRawQuery(text)) { throw invalid_argument("Query is dirty"s); }
+    
     Query query;
     for (const string& word : SplitIntoWords(text)) {
         const QueryWord query_word = ParseQueryWord(word);

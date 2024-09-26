@@ -173,6 +173,7 @@ void TestAddDocWithPositiveIdDoc();
 void TestAddDocContainingSpecSymbol();
 void TestClearRawFindDocs();
 void TestClearRawMatchDocs();
+void TestGettigIdByNaturalIndex();
 
 void TestAdditiveFunctions();
 void TestSearchServer();

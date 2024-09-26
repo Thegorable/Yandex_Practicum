@@ -354,6 +354,23 @@ void TestClearRawMatchDocs() {
     }
 }
 
+void TestGettigIdByNaturalIndex() {
+    const string msg_neg = "Correct getting id by natual index isn't work"s;
+    const string msg_pos = "Incorrect getting id by natual is passed"s;
+    
+    SearchServer serv("and"s);
+    serv.AddDocument(1, "fluffy"s, DocumentStatus::ACTUAL, { 1 });
+    serv.AddDocument(2, "tail"s, DocumentStatus::ACTUAL, { 1 });
+    AssertExeptionHintPositive([serv]() {serv.GetDocumentId(0); }, msg_neg);
+    AssertExeptionHintPositive([serv]() {serv.GetDocumentId(1); }, msg_neg);
+    AssertExeptionHintNegative([serv]() {serv.GetDocumentId(2); }, msg_neg);
+    
+    serv.AddDocument(3, "-tail"s, DocumentStatus::ACTUAL, { 1 });
+    AssertExeptionHintPositive([serv]() {serv.GetDocumentId(2); }, msg_neg);
+    AssertExeptionHintNegative([serv]() {serv.GetDocumentId(3); }, msg_neg);
+    AssertExeptionHintNegative([serv]() {serv.GetDocumentId(-1); }, msg_neg);
+}
+
 void TestAdditiveFunctions() {
     TestStringContaintSpecSymbols();
     TestIsCharsAreDoubleMinus();
@@ -381,4 +398,5 @@ void TestSearchServerExeptions() {
     RUN_TEST(TestAddDocUniqueIdDoc);
     RUN_TEST(TestAddDocWithPositiveIdDoc);
     RUN_TEST(TestAddDocContainingSpecSymbol);
+    RUN_TEST(TestGettigIdByNaturalIndex);
 }

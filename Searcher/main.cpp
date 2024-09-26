@@ -1,21 +1,10 @@
-﻿#include "Searcher.h"
-#include"Searcher_Tests.h"
-#include"Rational.h"
-
-#include <iostream>
-#include <set>
-#include <iostream>
-#include <set>
+﻿#include <iostream>
 #include <string>
 #include <vector>
-#include<numeric>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 
 int main() {
-    TestAdditiveFunctions();
-    TestSearchServer();
-    TestSearchServerExeptions();
-
-    //SearchServer searcher("in and \0on"); // check check check
 }
