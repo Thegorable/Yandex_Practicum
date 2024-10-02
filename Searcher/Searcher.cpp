@@ -89,10 +89,7 @@ bool IsNotCharsAfterMinus(const char* c) {
 }
 
 void PrintDocument(const Document& document) {
-    cout << "{ "s
-        << "document_id = "s << document.id << ", "s
-        << "relevance = "s << document.relevance << ", "s
-        << "rating = "s << document.rating << " }"s << endl;
+    cout << document << endl;
 }
 
 SearchServer::SearchServer(const string& text) :
@@ -240,4 +237,13 @@ bool SearchServer::IsClearRawQuery(const string& raw_query) const {
         }
     }
     return true;
+}
+
+ostream& operator<<(ostream& output, const Document& doc) {
+    output << "{ "s
+        << "document_id = "s << doc.id << ", "s
+        << "relevance = "s << doc.relevance << ", "s
+        << "rating = "s << doc.rating << " }"s;
+    
+    return output;
 }
