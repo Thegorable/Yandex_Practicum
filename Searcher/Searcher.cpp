@@ -247,3 +247,12 @@ ostream& operator<<(ostream& output, const Document& doc) {
     
     return output;
 }
+
+vector<Document> RequestQueue::AddFindRequest(const string& raw_query, DocumentStatus status) {
+    return AddFindRequest(raw_query, [status](int document_id, DocumentStatus status_lambda, int rating) {
+        return status == status_lambda; });
+}
+
+int RequestQueue::GetNoResultRequests() const {
+    return empty_results_size_;
+}

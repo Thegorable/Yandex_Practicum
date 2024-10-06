@@ -1,68 +1,23 @@
-﻿#include <iostream>
-#include <string>
-#include <vector>
-#include <set>
-#include <algorithm>
-#include "Searcher.h"
-#include <iterator>
+﻿#include "Searcher.h"
 
 using namespace std;
 
-set<int>::const_iterator FindNearestElement(const set<int>& numbers, int border) {
-    auto not_less = numbers.lower_bound(border);
-    
-    if (not_less == numbers.begin()) {
-        return not_less;
-    }
-
-    auto prev_it = next(not_less, -1);
-    if (not_less == numbers.end()) {
-        return prev_it;
-    }
-
-    if ((border - *prev_it) > ((*not_less - *prev_it) / 2)) {
-        return not_less;
-    }
-
-    return prev_it;
-}
-
-//template <typename it>
-//pair<it, it> FindStartsWith(it range_begin, it range_end, char prefix) {
-//    string prefix_s(1, prefix);
-//    it left = lower_bound(range_begin, range_end, prefix_s,
-//        [](const string& l, const string& r) {return l[0] < r[0]; });
-//
-//    it right = upper_bound(left, range_end, prefix_s,
-//        [](const string& l, const string& r) {return l[0] < r[0]; });
-//
-//    return { left, right };
-//}
-
-template <typename it>
-pair<it, it> FindStartsWith(it range_begin, it range_end, string prefix) {
-    it left = lower_bound(range_begin, range_end, prefix,
-        [](const string& element, const string& value) {return element.compare(0, value.size(), value) < 0; });
-
-    it right = upper_bound(left, range_end, prefix,
-        [](const string& value, const string& element) {return element.compare(0, value.size(), value) > 0; });
-
-    return { left, right };
-}
-
 int main() {
-    const vector<string> sorted_strings = { "moscow", "motovilikha", "murmansk" };
-    const auto mo_result = FindStartsWith(begin(sorted_strings), end(sorted_strings), "mo");
-    for (auto it = mo_result.first; it != mo_result.second; ++it) {
-        cout << *it << " ";
-    }
-    cout << endl;
-    const auto mt_result = FindStartsWith(begin(sorted_strings), end(sorted_strings), "mt");
-    cout << (mt_result.first - begin(sorted_strings)) << " " << (mt_result.second - begin(sorted_strings)) << endl;
-    const auto na_result = FindStartsWith(begin(sorted_strings), end(sorted_strings), "na");
-    cout << (na_result.first - begin(sorted_strings)) << " " << (na_result.second - begin(sorted_strings)) << endl;
-    return 0;
+    SearchServer search_server("and in at"s);
+    RequestQueue request_queue(search_server);
+    search_server.AddDocument(1, "curly cat curly tail"s, DocumentStatus::ACTUAL, { 7, 2, 7 });
+    search_server.AddDocument(2, "curly dog and fancy collar"s, DocumentStatus::ACTUAL, { 1, 2, 3 });
+    search_server.AddDocument(3, "big cat fancy collar "s, DocumentStatus::ACTUAL, { 1, 2, 8 });
+    search_server.AddDocument(4, "big dog sparrow Eugene"s, DocumentStatus::ACTUAL, { 1, 3, 2 });
+    search_server.AddDocument(5, "big dog sparrow Vasiliy"s, DocumentStatus::ACTUAL, { 1, 1, 1 });
 
-    //string a = "motovilikha"s;
-    //int comp = a.compare(0, 2,"mo"s);
+    for (int i = 0; i < 1439; ++i) {
+        request_queue.AddFindRequest("empty request"s);
+    }
+    request_queue.AddFindRequest("curly dog"s);
+    request_queue.AddFindRequest("big collar"s);
+    request_queue.AddFindRequest("sparrow"s);
+    
+    cout << "Total empty requests: "s << request_queue.GetNoResultRequests() << endl;
+    return 0;
 }

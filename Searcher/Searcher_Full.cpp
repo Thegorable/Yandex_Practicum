@@ -11,6 +11,8 @@
 #include <numeric>
 #include <optional>
 #include <stdexcept>
+#include <deque>
+#include <cstdint>
 
 using namespace std;
 
@@ -291,6 +293,50 @@ inline it Page<it>::Page::end() const {
     return doc_end_it_;
 }
 
+template <typename Container>
+auto Paginate(const Container& c, size_t page_size) {
+    return Paginator(begin(c), end(c), page_size);
+}
+
+
+class RequestQueue {
+public:
+    explicit RequestQueue(const SearchServer& search_server) : server(search_server) {}
+
+    template <typename DocumentPredicate>
+    vector<Document> AddFindRequest(const string& raw_query, DocumentPredicate document_predicate);
+    vector<Document> AddFindRequest(const string& raw_query, DocumentStatus status = DocumentStatus::ACTUAL);
+    int GetNoResultRequests() const;
+
+private:
+    struct QueryResult {
+        bool is_empty_ = true;
+        vector<Document> result;
+    };
+
+    deque<QueryResult> requests_;
+    const static int min_in_day_ = 1440;
+    const SearchServer& server;
+    int empty_results_size_ = 0;
+};
+
+template<typename DocumentPredicate>
+inline vector<Document> RequestQueue::AddFindRequest(const string& raw_query, DocumentPredicate document_predicate) {
+    QueryResult result;
+    result.result = server.FindTopDocuments(raw_query, document_predicate);
+    result.is_empty_ = result.result.empty();
+
+    if (result.is_empty_) { empty_results_size_++; }
+
+    if (requests_.size() == min_in_day_) {
+        if (requests_.front().is_empty_) { empty_results_size_--; }
+        requests_.pop_front();
+    }
+    requests_.push_back(move(result));
+
+    return requests_.back().result;
+}
+
 ostream& operator<<(ostream& output, const DocumentStatus& status) {
     switch (status) {
     case DocumentStatus::ACTUAL:
@@ -539,7 +585,11 @@ ostream& operator<<(ostream& output, const Document& doc) {
     return output;
 }
 
-template <typename Container>
-auto Paginate(const Container& c, size_t page_size) {
-    return Paginator(begin(c), end(c), page_size);
+vector<Document> RequestQueue::AddFindRequest(const string& raw_query, DocumentStatus status) {
+    return AddFindRequest(raw_query, [status](int document_id, DocumentStatus status_lambda, int rating) {
+        return status == status_lambda; });
+}
+
+int RequestQueue::GetNoResultRequests() const {
+    return empty_results_size_;
 }
