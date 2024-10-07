@@ -4,11 +4,11 @@
 #include "search_server.h"
 #include "read_input_functions.h"
 
-bool IsCharSpecSymbol(char c) {
+bool SearchServer::IsCharSpecSymbol(char c) {
     return c >= '\0' && c < ' ';
 }
 
-bool IsNotContainSpecSymbols(const std::string& text) {
+bool SearchServer::IsNotContainSpecSymbols(const std::string& text) {
     for (const char& c : text) {
         if (IsCharSpecSymbol(c)) {
             return false;
@@ -17,18 +17,12 @@ bool IsNotContainSpecSymbols(const std::string& text) {
     return true;
 }
 
-bool IsCharsAreDoubleMinus(const char* c) {
+bool SearchServer::IsCharsAreDoubleMinus(const char* c) {
     return *c == '-' && (*(c + 1) == '-');
 }
 
-bool IsNotCharsAfterMinus(const char* c) {
+bool SearchServer::IsNotCharsAfterMinus(const char* c) {
     return *c == '-' && (*(c + 1) == '\0' || *(c + 1) == ' ');
-}
-
-bool SearchServer::IsValidWord(const std::string& word) {
-    return std::none_of(word.begin(), word.end(), [](char c) {
-        return c >= '\0' && c < ' ';
-        });
 }
 
 SearchServer::SearchServer(const std::string& text) :
@@ -49,7 +43,7 @@ void SearchServer::AddDocument(int doc_id,
     DocumentStatus status,
     const std::vector<int>& ratings) {
 
-    if (docs_rating.count(doc_id) ||
+    if (documents_.count(doc_id) ||
         doc_id < 0 ||
         !IsNotContainSpecSymbols(document)) {
         throw std::invalid_argument("The dirty document is added");
@@ -59,8 +53,9 @@ void SearchServer::AddDocument(int doc_id,
     ids.push_back(doc_id);
     const std::vector<std::string> words = SplitIntoWordsNoStop(document);
     const double inv_word_count = 1.0 / words.size();
-    docs_rating[doc_id] = ComputeAverageRating(ratings);
-    docs_status[doc_id] = status;
+    documents_[doc_id].rating = ComputeAverageRating(ratings);
+    documents_[doc_id].status = status;
+
     for (const std::string& word : words) {
         word_to_document_freqs_[word][doc_id] += inv_word_count;
     }
@@ -74,16 +69,12 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_quer
     );
 }
 
-std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query) const {
-    return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
-}
-
 std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument(const std::string& raw_query,
     int document_id) const {
 
     Query query = ParseQuery(raw_query);
     std::tuple<std::vector<std::string>, DocumentStatus> matched_docs(std::tuple<std::vector<std::string>, DocumentStatus>{});
-    get<DocumentStatus>(matched_docs) = docs_status.at(document_id);
+    get<DocumentStatus>(matched_docs) = documents_.at(document_id).status;
 
     for (const std::string& word : query.minus_words) {
         if (word_to_document_freqs_.count(word) &&

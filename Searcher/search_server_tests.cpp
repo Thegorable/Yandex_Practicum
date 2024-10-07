@@ -201,36 +201,36 @@ void TestGettingDocumentCount() {
 }
 
 void TestStringContaintSpecSymbols() {
-    ASSERT(IsNotContainSpecSymbols("Clear String"));
-    ASSERT(IsNotContainSpecSymbols(""));
+    ASSERT(SearchServer::IsNotContainSpecSymbols("Clear String"));
+    ASSERT(SearchServer::IsNotContainSpecSymbols(""));
 
     char spec_char_1 = 0;
     char spec_char_2 = 10;
     char spec_char_3 = 20;
     char spec_char_4 = 30;
-    ASSERT(!IsNotContainSpecSymbols(spec_char_1 + "Dirty String"s));
-    ASSERT(!IsNotContainSpecSymbols("Dirty String"s + spec_char_2));
-    ASSERT(!IsNotContainSpecSymbols("Dirty"s + spec_char_3 + "String"s));
-    ASSERT(!IsNotContainSpecSymbols(spec_char_4 + "Dirty"s + spec_char_3 + "String"s + spec_char_1));
+    ASSERT(!SearchServer::IsNotContainSpecSymbols(spec_char_1 + "Dirty String"s));
+    ASSERT(!SearchServer::IsNotContainSpecSymbols("Dirty String"s + spec_char_2));
+    ASSERT(!SearchServer::IsNotContainSpecSymbols("Dirty"s + spec_char_3 + "String"s));
+    ASSERT(!SearchServer::IsNotContainSpecSymbols(spec_char_4 + "Dirty"s + spec_char_3 + "String"s + spec_char_1));
 }
 
 void TestIsCharsAreDoubleMinus() {
-    ASSERT(!IsCharsAreDoubleMinus("a"));
-    ASSERT(!IsCharsAreDoubleMinus("ab"));
-    ASSERT(!IsCharsAreDoubleMinus("-"));
-    ASSERT(!IsCharsAreDoubleMinus("-a"));
-    ASSERT(!IsCharsAreDoubleMinus("a-"));
+    ASSERT(!SearchServer::IsCharsAreDoubleMinus("a"));
+    ASSERT(!SearchServer::IsCharsAreDoubleMinus("ab"));
+    ASSERT(!SearchServer::IsCharsAreDoubleMinus("-"));
+    ASSERT(!SearchServer::IsCharsAreDoubleMinus("-a"));
+    ASSERT(!SearchServer::IsCharsAreDoubleMinus("a-"));
 
-    ASSERT(IsCharsAreDoubleMinus("--"));
+    ASSERT(SearchServer::IsCharsAreDoubleMinus("--"));
 }
 
 void TestIsNotCharsAfterMinus() {
-    ASSERT(!IsNotCharsAfterMinus("-a"));
-    ASSERT(!IsNotCharsAfterMinus("a"));
-    ASSERT(!IsNotCharsAfterMinus("\n"));
+    ASSERT(!SearchServer::IsNotCharsAfterMinus("-a"));
+    ASSERT(!SearchServer::IsNotCharsAfterMinus("a"));
+    ASSERT(!SearchServer::IsNotCharsAfterMinus("\n"));
 
-    ASSERT(IsNotCharsAfterMinus("-"));
-    ASSERT(IsNotCharsAfterMinus("- "));
+    ASSERT(SearchServer::IsNotCharsAfterMinus("-"));
+    ASSERT(SearchServer::IsNotCharsAfterMinus("- "));
 }
 
 void TestStopWordsQueryNotContainSpecSymbols() {

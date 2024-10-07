@@ -13,14 +13,6 @@
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 const double EPSILON = 1e-6;
 
-bool IsCharSpecSymbol(char c);
-
-bool IsNotContainSpecSymbols(const std::string& text);
-
-bool IsCharsAreDoubleMinus(const char* c);
-
-bool IsNotCharsAfterMinus(const char* c);
-
 class SearchServer {
 public:
     template<class container>
@@ -39,20 +31,19 @@ public:
     std::vector<Document> FindTopDocuments(const std::string& raw_query,
         DocumentPredicate document_predicate) const;
 
-    // std::vector<Document> FindTopDocuments(const std::string& raw_query,
-    //     const DocumentStatus status = DocumentStatus::ACTUAL) const;
-
-    std::vector<Document> FindTopDocuments(const std::string& raw_query,
-        DocumentStatus status) const;
-
-    std::vector<Document> FindTopDocuments(const std::string& raw_query) const;
+     std::vector<Document> FindTopDocuments(const std::string& raw_query,
+         const DocumentStatus status = DocumentStatus::ACTUAL) const;
 
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query,
         int document_id) const;
 
     int GetDocumentCount();
-
     int GetDocumentId(int index) const;
+    
+    static bool IsCharSpecSymbol(char c);
+    static bool IsNotContainSpecSymbols(const std::string& text);
+    static bool IsCharsAreDoubleMinus(const char* c);
+    static bool IsNotCharsAfterMinus(const char* c);
 
 private:
     struct DocumentData {
@@ -63,8 +54,7 @@ private:
     int document_count_ = 0;
     std::set<std::string> stop_words_;
     std::map<std::string, std::map<int, double>> word_to_document_freqs_;
-    std::map<int, int> docs_rating;
-    std::map<int, DocumentStatus> docs_status;
+    std::map<int, DocumentData> documents_;
     std::vector<int> ids;
 
     struct QueryWord {
@@ -94,28 +84,15 @@ private:
     double ComputeWordInverseDocumentFreq(const std::string& word) const;
 
     bool IsClearRawQuery(const std::string& raw_query) const;
-
-    bool IsValidWord(const std::string& word);
 };
 
-//template<typename container>
-//SearchServer::SearchServer(const container& cont) {
-//    for (const auto& word : cont) {
-//        if (!IsNotContainSpecSymbols(word)) {
-//            throw std::invalid_argument("Stop words query contains special symbols");
-//        }
-//        stop_words_.insert(word);
-//    }
-//}
-
-template <typename container>
-SearchServer::SearchServer(const container& stop_words)
-    : stop_words_(MakeUniqueNonEmptyStrings(stop_words))
-{
-    if (!all_of(stop_words_.begin(), stop_words_.end(), 
-        [this](const std::string& str) {return this->IsValidWord(str); })) {
-        using namespace std;
-        throw std::invalid_argument("Some of stop words are invalid"s);
+template<typename container>
+SearchServer::SearchServer(const container& cont) {
+    for (const auto& word : cont) {
+        if (!IsNotContainSpecSymbols(word)) {
+            throw std::invalid_argument("Stop words query contains special symbols");
+        }
+        stop_words_.insert(word);
     }
 }
 
@@ -128,7 +105,7 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_quer
 
     std::sort(matched_docs.begin(), matched_docs.end(),
         [](const Document& lhs, const Document& rhs) {
-            if (abs(lhs.relevance - rhs.relevance) < EPSILON) {
+            if (std::abs(lhs.relevance - rhs.relevance) < EPSILON) {
                 return lhs.rating > rhs.rating;
             }
             return lhs.relevance > rhs.relevance;
@@ -163,9 +140,10 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, predica
 
     std::vector<Document> matched_documents;
     for (const auto& [id, relevance] : document_to_relevance) {
-        if (comp(id, docs_status.at(id), docs_rating.at(id))) {
-            matched_documents.push_back({ id, relevance, docs_rating.at(id) });
+        if (comp(id, documents_.at(id).status, documents_.at(id).rating)) {
+            matched_documents.push_back({ id, relevance, documents_.at(id).rating });
         }
     }
+
     return matched_documents;
 }
