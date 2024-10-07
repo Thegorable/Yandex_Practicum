@@ -1,13 +1,18 @@
 #pragma once
-#include "Searcher_Tests.h"
-#include "Searcher.h"
+#include<iostream>
+#include<vector>
+#include<stdexcept>
+#include "search_server_tests.h"
+#include "search_server.h"
+
+using namespace std;
 
 void TestExcludeStopWords() {
     const int id = 42;
     const string content = "cat in the city"s;
     const vector<int> ratings = { 4, 5, -6 };
     {
-        SearchServer server;
+        SearchServer server(""s);
         server.AddDocument(id, content, DocumentStatus::ACTUAL, ratings);
         vector<Document> found_docs = server.FindTopDocuments("in"s);
         ASSERT_EQUAL(found_docs.size(), (size_t)1);
@@ -15,15 +20,14 @@ void TestExcludeStopWords() {
         ASSERT_EQUAL(doc.id, id);
     }
     {
-        SearchServer server;
-        server.SetStopWords("in the"s);
+        SearchServer server("in the"s);
         server.AddDocument(id, content, DocumentStatus::ACTUAL, ratings);
         auto found_docs = server.FindTopDocuments("in"s);
         ASSERT_HINT(found_docs.empty(), "Stop words must be excluded from documents"s);
     }
 }
 void TestExcludeDocumentsWithMinusWords() {
-    SearchServer server;
+    SearchServer server(""s);
     server.AddDocument(0, "dog in house"s, DocumentStatus::ACTUAL, { 1 });
     server.AddDocument(1, "dog in the street"s, DocumentStatus::ACTUAL, { 1 });
     {
@@ -42,7 +46,7 @@ void TestExcludeDocumentsWithMinusWords() {
     }
 }
 void TestExcludeAllMatchedWordsIfMinusWordExists() {
-    SearchServer server;
+    SearchServer server(""s);
     server.AddDocument(0, "big fat bunny walk in the city"s, DocumentStatus::ACTUAL, { 1 });
     {
         auto matched_docs = server.MatchDocument("walk bunny"s, 0);
@@ -57,7 +61,7 @@ void TestExcludeAllMatchedWordsIfMinusWordExists() {
     }
 }
 void TestSortingByRelevance() {
-    SearchServer server;
+    SearchServer server(""s);
     server.AddDocument(0, "white cat collar cat"s, DocumentStatus::ACTUAL, { 1 });
     server.AddDocument(1, "fluffy cat fluffy cat tail"s, DocumentStatus::ACTUAL, { 1 });
     server.AddDocument(2, "groomed dog beautiful cat eyes"s, DocumentStatus::ACTUAL, { 1 });
@@ -72,14 +76,14 @@ void TestSortingByRelevance() {
     }
 }
 void TestRatingAveraging() {
-    SearchServer server;
+    SearchServer server(""s);
     server.AddDocument(0, "cat"s, DocumentStatus::ACTUAL, { -5, 50, 15 });
     auto found_docs = server.FindTopDocuments("cat"s);
     ASSERT_EQUAL(found_docs.size(), 1u);
     ASSERT_EQUAL(found_docs.front().rating, (-5 + 50 + 15) / 3);
 }
 void TestDocumentsAreFilteredByPredicat() {
-    SearchServer server;
+    SearchServer server(""s);
     server.AddDocument(0, "groomed dog"s, DocumentStatus::ACTUAL, { 1 });
     server.AddDocument(1, "scary dog"s, DocumentStatus::ACTUAL, { 1 });
     auto found_docs = server.FindTopDocuments("dog"s);
@@ -90,7 +94,7 @@ void TestDocumentsAreFilteredByPredicat() {
     ASSERT(found_docs.front().id == 0);
 }
 void TestFilteringByStatus() {
-    SearchServer server;
+    SearchServer server(""s);
     server.AddDocument(0, "groomed dog"s, DocumentStatus::BANNED, { 1 });
     server.AddDocument(1, "scary dog"s, DocumentStatus::ACTUAL, { 1 });
     server.AddDocument(2, "angry dog"s, DocumentStatus::IRRELEVANT, { 1 });
@@ -120,7 +124,7 @@ bool EqualFloat(double a, double b) {
     return abs(a - b) < 1e-6;
 }
 void TestRelevanceCalculation() {
-    SearchServer server;
+    SearchServer server(""s);
     server.AddDocument(0, "cat"s, DocumentStatus::ACTUAL, { 1 });
     server.AddDocument(1, "dog parrot"s, DocumentStatus::ACTUAL, { 1 });
     server.AddDocument(2, "parrot fox bunny shark"s, DocumentStatus::ACTUAL, { 1 });
@@ -167,7 +171,7 @@ void TestRelevanceCalculation() {
     }
 }
 void TestMatchingDocuments() {
-    SearchServer server;
+    SearchServer server(""s);
     server.SetStopWords("a the and"s);
     server.AddDocument(0, "a quick brown fox jumps over the lazy dog"s, DocumentStatus::BANNED, { 1, 2, 3 });
     auto matched_docs = server.MatchDocument("a lazy cat and the brown dog"s, 0);
@@ -188,7 +192,7 @@ void TestMatchingDocuments() {
     ASSERT_EQUAL(status, DocumentStatus::BANNED);
 }
 void TestGettingDocumentCount() {
-    SearchServer server;
+    SearchServer server(""s);
     ASSERT_EQUAL(server.GetDocumentCount(), 0);
     server.AddDocument(0, "bla bla bla"s, DocumentStatus::ACTUAL, { 1 });
     ASSERT_EQUAL(server.GetDocumentCount(), 1);
@@ -216,7 +220,7 @@ void TestIsCharsAreDoubleMinus() {
     ASSERT(!IsCharsAreDoubleMinus("-"));
     ASSERT(!IsCharsAreDoubleMinus("-a"));
     ASSERT(!IsCharsAreDoubleMinus("a-"));
-    
+
     ASSERT(IsCharsAreDoubleMinus("--"));
 }
 
@@ -224,7 +228,7 @@ void TestIsNotCharsAfterMinus() {
     ASSERT(!IsNotCharsAfterMinus("-a"));
     ASSERT(!IsNotCharsAfterMinus("a"));
     ASSERT(!IsNotCharsAfterMinus("\n"));
-    
+
     ASSERT(IsNotCharsAfterMinus("-"));
     ASSERT(IsNotCharsAfterMinus("- "));
 }

@@ -15,16 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Searcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BusManager_tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BusManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Searcher_Tests.h">
+    <ClInclude Include="search_server_tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Rational.h">
@@ -39,25 +36,52 @@
     <ClInclude Include="Sort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="read_input_functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="document.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="search_server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="paginator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="request_queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="string_processing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Searcher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Searcher_Tests.cpp">
+    <ClCompile Include="search_server_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rational.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Searcher_Full.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TowerHanoi.h">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="document.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="read_input_functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="string_processing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="request_queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="search_server.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -25,6 +25,8 @@
     <ClInclude Include="BusManager_tests.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="document.h" />
+    <ClInclude Include="paginator.h" />
     <ClInclude Include="Permutations.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -34,28 +36,30 @@
     <ClInclude Include="Rational.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Searcher.h" />
-    <ClInclude Include="Searcher_Tests.h">
+    <ClInclude Include="read_input_functions.h" />
+    <ClInclude Include="request_queue.h" />
+    <ClInclude Include="search_server_tests.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="search_server.h" />
     <ClInclude Include="Sort.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="string_processing.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="document.cpp" />
     <ClCompile Include="Rational.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Searcher.cpp">
+    <ClCompile Include="read_input_functions.cpp" />
+    <ClCompile Include="request_queue.cpp" />
+    <ClCompile Include="search_server.cpp" />
+    <ClCompile Include="search_server_tests.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Searcher_Full.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Searcher_Tests.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="string_processing.cpp" />
     <ClCompile Include="TowerHanoi.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
