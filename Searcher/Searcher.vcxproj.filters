@@ -13,45 +13,66 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="backup">
+      <UniqueIdentifier>{db5e0050-5fdf-4acc-9cc3-bb231f30bbc7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BusManager_tests.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BusManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>backup</Filter>
     </ClInclude>
-    <ClInclude Include="search_server_tests.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="BusManager_tests.h">
+      <Filter>backup</Filter>
     </ClInclude>
-    <ClInclude Include="Rational.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="compressor.h">
+      <Filter>backup</Filter>
     </ClInclude>
-    <ClInclude Include="PrintRange.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Permutations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sort.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="read_input_functions.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="decompressor.h">
+      <Filter>backup</Filter>
     </ClInclude>
     <ClInclude Include="document.h">
-      <Filter>Header Files</Filter>
+      <Filter>backup</Filter>
     </ClInclude>
-    <ClInclude Include="search_server.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="log_duration.h">
+      <Filter>backup</Filter>
     </ClInclude>
     <ClInclude Include="paginator.h">
-      <Filter>Header Files</Filter>
+      <Filter>backup</Filter>
+    </ClInclude>
+    <ClInclude Include="Permutations.h">
+      <Filter>backup</Filter>
+    </ClInclude>
+    <ClInclude Include="PrintRange.h">
+      <Filter>backup</Filter>
+    </ClInclude>
+    <ClInclude Include="Rational.h">
+      <Filter>backup</Filter>
+    </ClInclude>
+    <ClInclude Include="read_input_functions.h">
+      <Filter>backup</Filter>
     </ClInclude>
     <ClInclude Include="request_queue.h">
-      <Filter>Header Files</Filter>
+      <Filter>backup</Filter>
+    </ClInclude>
+    <ClInclude Include="search_server.h">
+      <Filter>backup</Filter>
+    </ClInclude>
+    <ClInclude Include="search_server_tests.h">
+      <Filter>backup</Filter>
+    </ClInclude>
+    <ClInclude Include="Sort.h">
+      <Filter>backup</Filter>
     </ClInclude>
     <ClInclude Include="string_processing.h">
+      <Filter>backup</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>backup</Filter>
+    </ClInclude>
+    <ClInclude Include="octupus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SingleLinkedList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,29 +80,32 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="search_server_tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Rational.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TowerHanoi.h">
-      <Filter>Header Files</Filter>
+      <Filter>backup</Filter>
     </ClCompile>
     <ClCompile Include="document.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>backup</Filter>
+    </ClCompile>
+    <ClCompile Include="Rational.cpp">
+      <Filter>backup</Filter>
     </ClCompile>
     <ClCompile Include="read_input_functions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="string_processing.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>backup</Filter>
     </ClCompile>
     <ClCompile Include="request_queue.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>backup</Filter>
     </ClCompile>
     <ClCompile Include="search_server.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>backup</Filter>
+    </ClCompile>
+    <ClCompile Include="search_server_tests.cpp">
+      <Filter>backup</Filter>
+    </ClCompile>
+    <ClCompile Include="string_processing.cpp">
+      <Filter>backup</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>backup</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

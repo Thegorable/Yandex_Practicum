@@ -1,35 +1,75 @@
-﻿#include "paginator.h"
-#include "read_input_functions.h"
-#include "request_queue.h"
-#include "search_server.h"
+﻿#include <cassert>
+#include <cstdlib>
+#include<algorithm>
 
-#include <iostream>
-#include <cstdint>
+template <typename Type>
+class ArrayPtr {
+public:
+    
+    ArrayPtr() = default;
 
-#include "search_server_tests.h"
+    explicit ArrayPtr(size_t size) {
+        if (size) {
+            raw_ptr_ = new Type[size];
+        }
+    }
 
-using namespace std;
+    explicit ArrayPtr(Type* raw_ptr) noexcept : raw_ptr_(raw_ptr) {}
+ 
+    ArrayPtr(const ArrayPtr&) = delete;
 
+    ArrayPtr& operator=(const ArrayPtr&) = delete;
+  
+    [[nodiscard]] Type* Release() noexcept {
+        Type* temp = raw_ptr_;
+        raw_ptr_ = nullptr;
+        return temp;
+    }
+
+    Type& operator[](size_t index) noexcept {
+        return raw_ptr_[index];
+    }
+
+    const Type& operator[](size_t index) const noexcept {
+        return raw_ptr_[index];
+    }
+
+    explicit operator bool() const {
+        return (bool)raw_ptr_;
+    }
+
+    Type* Get() const noexcept {
+        return raw_ptr_;
+    }
+
+    void swap(ArrayPtr& other) noexcept {
+        std::swap(other.raw_ptr_, raw_ptr_);
+    }
+
+    ~ArrayPtr() {
+        delete[] raw_ptr_;
+        raw_ptr_ = nullptr;
+    }
+
+private:
+    Type* raw_ptr_ = nullptr;
+};
 
 int main() {
-    SearchServer search_server("and in on"s);
-    RequestQueue request_queue(search_server);
+    ArrayPtr<int> numbers(10);
+    const auto& const_numbers = numbers;
 
-    search_server.AddDocument(1, "fluffy cat fluffy tail"s, DocumentStatus::ACTUAL, { 7, 2, 7 });
-    search_server.AddDocument(2, "fluffy dog and cool collar"s, DocumentStatus::ACTUAL, { 1, 2, 3 });
-    search_server.AddDocument(3, "big cat cool collar "s, DocumentStatus::ACTUAL, { 1, 2, 8 });
-    search_server.AddDocument(4, "big dog starling evgeny"s, DocumentStatus::ACTUAL, { 1, 3, 2 });
-    search_server.AddDocument(5, "big dog starling vasily"s, DocumentStatus::ACTUAL, { 1, 1, 1 });
+    numbers[2] = 42;
+    assert(const_numbers[2] == 42);
+    assert(&const_numbers[2] == &numbers[2]);
 
-    // 1439 запросов с нулевым результатом
-    for (int i = 0; i < 1439; ++i) {
-        request_queue.AddFindRequest("empty request"s);
-    }
-    // все еще 1439 запросов с нулевым результатом
-    request_queue.AddFindRequest("fluffy dog"s);
-    // новые сутки, первый запрос удален, 1438 запросов с нулевым результатом
-    request_queue.AddFindRequest("big collar"s);
-    // первый запрос удален, 1437 запросов с нулевым результатом
-    request_queue.AddFindRequest("starling"s);
-    cout << "Empty requaests "s << request_queue.GetNoResultRequests();
+    assert(numbers.Get() == &numbers[0]);
+
+    ArrayPtr<int> numbers_2(5);
+    numbers_2[2] = 43;
+
+    numbers.swap(numbers_2);
+
+    assert(numbers_2[2] == 42);
+    assert(numbers[2] == 43);
 }
