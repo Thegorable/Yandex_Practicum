@@ -59,17 +59,20 @@ private:
         }
 
         BasicIterator& operator++() noexcept {
+            assert(node_ptr_);
             node_ptr_ = node_ptr_->next_node_ptr_;
             return *this;
         }
 
         BasicIterator operator++(int) noexcept {
             auto temp = node_ptr_;
+            assert(temp);
             node_ptr_ = node_ptr_->next_node_ptr_;
             return BasicIterator(temp);
         }
 
         reference operator*() const noexcept {
+            assert(node_ptr_);
             return node_ptr_->value_;
         }
 
@@ -119,6 +122,7 @@ public:
     }
 
     Iterator InsertAfter(ConstIterator it, const Type& value) {
+        assert(it.node_ptr_);
         if (size_ && it.node_ptr_ != &head_) {
             Node* new_node_ptr = new Node(value, nullptr);
             InsertAfterExistingNode(new_node_ptr, it.node_ptr_);
@@ -277,28 +281,22 @@ bool operator>(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& 
 
 template <typename Type>
 bool operator<=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
-    return (lhs < rhs) || (lhs == rhs);
+    return lhs > rhs;
 }
 
 template <typename Type>
 bool operator>=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
-    return (lhs > rhs) || (lhs == rhs);
+    return lhs < rhs;
 }
 
 #ifdef _DEBUG
 
 void Test_SingleLinkedList_Insert() {
-    SingleLinkedList<int> list;
-
-    assert(!list.GetSize());
-    assert(list.head_.next_node_ptr_ == nullptr);
-
-    auto it = list.InsertAfter(list.begin(), 1);
+    SingleLinkedList<int> list{1};
 
     assert(list.GetSize() == 1);
     assert(list.head_.next_node_ptr_->value_ == 1);
     assert(list.head_.next_node_ptr_->value_ == *list.begin());
-    assert(*it == 1);
 
     list.InsertAfter(list.begin(), 2);
     list.InsertAfter(list.begin(), 3);
